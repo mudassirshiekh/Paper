@@ -23,16 +23,16 @@ index c8a8903d1b0c9822743549ecb8e4fdc7d0fd07c1..032f8b762b552e8cae20bbdd75c1e084
  }
  
 +// Paper start
-+val generatedApiPath: java.nio.file.Path = rootProject.projectDir.toPath().resolve("paper-api-generator/generated")
++val generatedApiDir: File = rootProject.file("paper-generator/generatedApi")
 +idea {
 +    module {
-+        generatedSourceDirs.add(generatedApiPath.toFile())
++        generatedSourceDirs.add(generatedApiDir)
 +    }
 +}
 +sourceSets {
 +    main {
 +        java {
-+            srcDir(generatedApiPath)
++            srcDir(generatedApiDir)
 +        }
 +    }
 +}
@@ -54,8 +54,8 @@ index c8a8903d1b0c9822743549ecb8e4fdc7d0fd07c1..032f8b762b552e8cae20bbdd75c1e084
 +}
 +tasks.check {
 +    dependsOn(scanJarForOldGeneratedCode)
++    dependsOn(":paper-generator:scanOldGeneratedSourceCode")
 +}
-+// Paper end
 diff --git a/src/main/java/io/papermc/paper/generated/GeneratedFrom.java b/src/main/java/io/papermc/paper/generated/GeneratedFrom.java
 new file mode 100644
 index 0000000000000000000000000000000000000000..2512dba27edfdccbc4430815b6cba048e3d93484
