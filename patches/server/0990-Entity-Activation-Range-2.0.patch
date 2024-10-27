@@ -17,7 +17,7 @@ Adds villagers as separate config
 public net.minecraft.world.entity.Entity isInsidePortal
 
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
-index dec865affbaaa71d09806143d13a854100b98f23..eadbf175c69b6bb2d0df723afac96a517ebf0d83 100644
+index 81eb2d57045dd9d692109b33fc10804ff3d68d54..aee8d882783130ed45a713e6c266114aaf4c0d93 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java
 +++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
 @@ -2,7 +2,6 @@ package net.minecraft.server.level;
@@ -111,7 +111,7 @@ index dec865affbaaa71d09806143d13a854100b98f23..eadbf175c69b6bb2d0df723afac96a51
          } else {
              passenger.stopRiding();
 diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
-index eda8a591033885c5dcb95f5ff651b12529f479ba..242d9213d22cb552e48beee03aa2db141e39d1c4 100644
+index 6fe90b281c95062c0be14650c00b21b641c42394..5d5b6c5c5127abc6c59811bc172e931f3f2ad58d 100644
 --- a/src/main/java/net/minecraft/world/entity/Entity.java
 +++ b/src/main/java/net/minecraft/world/entity/Entity.java
 @@ -418,6 +418,8 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
@@ -341,7 +341,7 @@ index 0b7f52021441d633c37543e8ae485e81c292b747..d7f8464bf3eed0e42a5fc7f14a5b243d
 +
  }
 diff --git a/src/main/java/net/minecraft/world/level/Level.java b/src/main/java/net/minecraft/world/level/Level.java
-index 574175449af5b767f28e95ff8708ed37fedf4c7d..ce9350ed3c5c5fbbd9b2ade9ae2880e03305c787 100644
+index 36670466c4b927e65aa7011b29f85cfad683f2dd..3272af72ae0609bb9c928d0e4a8ba2ca3d90d63a 100644
 --- a/src/main/java/net/minecraft/world/level/Level.java
 +++ b/src/main/java/net/minecraft/world/level/Level.java
 @@ -157,6 +157,12 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
@@ -373,7 +373,7 @@ index d7b963571c900f0f68005d6954bcd9ef1d9e0b7c..b35f476e26a020cf75e53a5eb488717d
                              }
                          }
 diff --git a/src/main/java/org/spigotmc/ActivationRange.java b/src/main/java/org/spigotmc/ActivationRange.java
-index 9fb9fa62c32445ac3c3883a6433759c86dcfc428..bf2d18f74b0f0da7c3c30310c74224a1c0853564 100644
+index bd3682f2193b6febcd0cbf7d2d9f34c0f9ac2670..b2c1e686a312b03865ed980c0500687d036317e8 100644
 --- a/src/main/java/org/spigotmc/ActivationRange.java
 +++ b/src/main/java/org/spigotmc/ActivationRange.java
 @@ -1,33 +1,43 @@
@@ -721,7 +721,7 @@ index 9fb9fa62c32445ac3c3883a6433759c86dcfc428..bf2d18f74b0f0da7c3c30310c74224a1
  
          // Should this entity tick?
          if ( !isActive )
-@@ -248,15 +403,19 @@ public class ActivationRange
+@@ -248,11 +403,14 @@ public class ActivationRange
              if ( ( MinecraftServer.currentTick - entity.activatedTick - 1 ) % 20 == 0 )
              {
                  // Check immunities every 20 ticks.
@@ -738,14 +738,8 @@ index 9fb9fa62c32445ac3c3883a6433759c86dcfc428..bf2d18f74b0f0da7c3c30310c74224a1
                  }
 +                // Paper end
                  isActive = true;
-+
              }
              // Add a little performance juice to active entities. Skip 1/4 if not immune.
--        } else if ( !entity.defaultActivationState && (entity.tickCount + entity.getId()) % 4 == 0 && !ActivationRange.checkEntityImmunities( entity ) ) // Paper - Ensure checking item movement is offset from Spigot's entity activation range check
-+        } else if ( (entity.tickCount + entity.getId()) % 4 == 0 && ActivationRange.checkEntityImmunities( entity ) < 0 ) // Paper
-         {
-             isActive = false;
-         }
 diff --git a/src/main/java/org/spigotmc/SpigotWorldConfig.java b/src/main/java/org/spigotmc/SpigotWorldConfig.java
 index 2b263246135c85aa225120519e9702a628773935..2c408fa4abcbe1171c58aee8799c8cf7867d0f0a 100644
 --- a/src/main/java/org/spigotmc/SpigotWorldConfig.java
