@@ -373,7 +373,7 @@ index d7b963571c900f0f68005d6954bcd9ef1d9e0b7c..b35f476e26a020cf75e53a5eb488717d
                              }
                          }
 diff --git a/src/main/java/org/spigotmc/ActivationRange.java b/src/main/java/org/spigotmc/ActivationRange.java
-index bd3682f2193b6febcd0cbf7d2d9f34c0f9ac2670..b2c1e686a312b03865ed980c0500687d036317e8 100644
+index 00242230e327fb9dd99109398aa7c013bea8af8d..c7efdd1483b309ed8121e2203216ab288daa3117 100644
 --- a/src/main/java/org/spigotmc/ActivationRange.java
 +++ b/src/main/java/org/spigotmc/ActivationRange.java
 @@ -1,33 +1,43 @@
@@ -738,8 +738,8 @@ index bd3682f2193b6febcd0cbf7d2d9f34c0f9ac2670..b2c1e686a312b03865ed980c0500687d
                  }
 +                // Paper end
                  isActive = true;
-             }
-             // Add a little performance juice to active entities. Skip 1/4 if not immune.
+             } else if (entity instanceof net.minecraft.world.entity.item.ItemEntity && (entity.tickCount + 1 + entity.getId()) % 4 == 0) { // Paper - Needed for item gravity, see ItemEntity tick. +1 since the entity tick counter is increased AFTER...
+                 isActive = true;
 diff --git a/src/main/java/org/spigotmc/SpigotWorldConfig.java b/src/main/java/org/spigotmc/SpigotWorldConfig.java
 index 2b263246135c85aa225120519e9702a628773935..2c408fa4abcbe1171c58aee8799c8cf7867d0f0a 100644
 --- a/src/main/java/org/spigotmc/SpigotWorldConfig.java

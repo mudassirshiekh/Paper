@@ -28,17 +28,20 @@ index f9dfd6e7b610cfee75524a525ab0e72bed5522da..e110296a95441a13ec431d897796326b
                  float f = 0.98F;
  
 diff --git a/src/main/java/org/spigotmc/ActivationRange.java b/src/main/java/org/spigotmc/ActivationRange.java
-index 6d51464f6368151e8acc532414ee223714584e96..bd3682f2193b6febcd0cbf7d2d9f34c0f9ac2670 100644
+index 6d51464f6368151e8acc532414ee223714584e96..00242230e327fb9dd99109398aa7c013bea8af8d 100644
 --- a/src/main/java/org/spigotmc/ActivationRange.java
 +++ b/src/main/java/org/spigotmc/ActivationRange.java
-@@ -256,10 +256,10 @@ public class ActivationRange
+@@ -254,12 +254,11 @@ public class ActivationRange
+                     entity.activatedTick = MinecraftServer.currentTick + 20;
+                 }
                  isActive = true;
++            } else if (entity instanceof net.minecraft.world.entity.item.ItemEntity && (entity.tickCount + 1 + entity.getId()) % 4 == 0) { // Paper - Needed for item gravity, see ItemEntity tick. +1 since the entity tick counter is increased AFTER...
++                isActive = true;
              }
-             // Add a little performance juice to active entities. Skip 1/4 if not immune.
+-            // Add a little performance juice to active entities. Skip 1/4 if not immune.
 -        } else if ( !entity.defaultActivationState && entity.tickCount % 4 == 0 && !ActivationRange.checkEntityImmunities( entity ) )
 -        {
-+        } else if (entity instanceof net.minecraft.world.entity.item.ItemEntity && (entity.tickCount + 1 + entity.getId()) % 4 == 0) { // Paper - Needed for item gravity, see ItemEntity tick. +1 since the entity tick counter is increased AFTER...
-             isActive = false;
+-            isActive = false;
          }
 +        // Paper - remove dumb active tick skipping
          return isActive;
