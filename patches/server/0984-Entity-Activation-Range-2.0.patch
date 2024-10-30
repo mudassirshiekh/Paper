@@ -372,7 +372,7 @@ index d7b963571c900f0f68005d6954bcd9ef1d9e0b7c..b35f476e26a020cf75e53a5eb488717d
                              }
                          }
 diff --git a/src/main/java/org/spigotmc/ActivationRange.java b/src/main/java/org/spigotmc/ActivationRange.java
-index 9fb9fa62c32445ac3c3883a6433759c86dcfc428..3283ed99c35ffed6805567705e0518d9f84feedc 100644
+index 00242230e327fb9dd99109398aa7c013bea8af8d..08bae79a7e2bd592f032c154e8c8016b68fa93c4 100644
 --- a/src/main/java/org/spigotmc/ActivationRange.java
 +++ b/src/main/java/org/spigotmc/ActivationRange.java
 @@ -1,33 +1,43 @@
@@ -720,7 +720,7 @@ index 9fb9fa62c32445ac3c3883a6433759c86dcfc428..3283ed99c35ffed6805567705e0518d9
  
          // Should this entity tick?
          if ( !isActive )
-@@ -248,15 +403,19 @@ public class ActivationRange
+@@ -248,11 +403,14 @@ public class ActivationRange
              if ( ( MinecraftServer.currentTick - entity.activatedTick - 1 ) % 20 == 0 )
              {
                  // Check immunities every 20 ticks.
@@ -737,14 +737,8 @@ index 9fb9fa62c32445ac3c3883a6433759c86dcfc428..3283ed99c35ffed6805567705e0518d9
                  }
 +                // Paper end
                  isActive = true;
-+
-             }
-             // Add a little performance juice to active entities. Skip 1/4 if not immune.
--        } else if ( !entity.defaultActivationState && (entity.tickCount + entity.getId()) % 4 == 0 && !ActivationRange.checkEntityImmunities( entity ) ) // Paper - Ensure checking item movement is offset from Spigot's entity activation range check
-+        } else if ( (entity.tickCount + entity.getId()) % 4 == 0 && ActivationRange.checkEntityImmunities( entity ) < 0 ) // Paper
-         {
-             isActive = false;
-         }
+             } else if (entity instanceof net.minecraft.world.entity.item.ItemEntity && (entity.tickCount + 1 + entity.getId()) % 4 == 0) { // Paper - Needed for item gravity, see ItemEntity tick. +1 since the entity tick counter is increased AFTER...
+                 isActive = true;
 diff --git a/src/main/java/org/spigotmc/SpigotWorldConfig.java b/src/main/java/org/spigotmc/SpigotWorldConfig.java
 index 37bbda040bd6f8a92295d2f32affbb53ea2d369b..dbfe355221fb2ee66b79442a749412d9288afc0d 100644
 --- a/src/main/java/org/spigotmc/SpigotWorldConfig.java
