@@ -147,7 +147,7 @@ index b108f779abe3d9798c0bcbc983f41d48b33aa153..a66fe080ee73171090abec48352ad0bd
              movement = this.maybeBackOffFromEdge(movement, movementType);
              Vec3 vec3d1 = this.collide(movement);
 diff --git a/src/main/java/net/minecraft/world/entity/Mob.java b/src/main/java/net/minecraft/world/entity/Mob.java
-index d2f5d959d3b67f7c20d0c0de462a18d667f3a84b..2439f8d48daca7329049436414f06a36b4b79029 100644
+index 11c933a662c2275e2ef239cb0b5dd2480cc55490..d2c92df28475f0a32a0134324eb0a5609a9afb99 100644
 --- a/src/main/java/net/minecraft/world/entity/Mob.java
 +++ b/src/main/java/net/minecraft/world/entity/Mob.java
 @@ -222,6 +222,19 @@ public abstract class Mob extends LivingEntity implements Targeting {
@@ -372,7 +372,7 @@ index 0e15da7cae105196d444b924b8e0db190583ba30..9f45dda6ff45ac1ffb7ac99575b7d09b
                              }
                          }
 diff --git a/src/main/java/org/spigotmc/ActivationRange.java b/src/main/java/org/spigotmc/ActivationRange.java
-index 9fb9fa62c32445ac3c3883a6433759c86dcfc428..3283ed99c35ffed6805567705e0518d9f84feedc 100644
+index 00242230e327fb9dd99109398aa7c013bea8af8d..08bae79a7e2bd592f032c154e8c8016b68fa93c4 100644
 --- a/src/main/java/org/spigotmc/ActivationRange.java
 +++ b/src/main/java/org/spigotmc/ActivationRange.java
 @@ -1,33 +1,43 @@
@@ -720,7 +720,7 @@ index 9fb9fa62c32445ac3c3883a6433759c86dcfc428..3283ed99c35ffed6805567705e0518d9
  
          // Should this entity tick?
          if ( !isActive )
-@@ -248,15 +403,19 @@ public class ActivationRange
+@@ -248,11 +403,14 @@ public class ActivationRange
              if ( ( MinecraftServer.currentTick - entity.activatedTick - 1 ) % 20 == 0 )
              {
                  // Check immunities every 20 ticks.
@@ -737,14 +737,8 @@ index 9fb9fa62c32445ac3c3883a6433759c86dcfc428..3283ed99c35ffed6805567705e0518d9
                  }
 +                // Paper end
                  isActive = true;
-+
-             }
-             // Add a little performance juice to active entities. Skip 1/4 if not immune.
--        } else if ( !entity.defaultActivationState && (entity.tickCount + entity.getId()) % 4 == 0 && !ActivationRange.checkEntityImmunities( entity ) ) // Paper - Ensure checking item movement is offset from Spigot's entity activation range check
-+        } else if ( (entity.tickCount + entity.getId()) % 4 == 0 && ActivationRange.checkEntityImmunities( entity ) < 0 ) // Paper
-         {
-             isActive = false;
-         }
+             } else if (entity instanceof net.minecraft.world.entity.item.ItemEntity && (entity.tickCount + 1 + entity.getId()) % 4 == 0) { // Paper - Needed for item gravity, see ItemEntity tick. +1 since the entity tick counter is increased AFTER...
+                 isActive = true;
 diff --git a/src/main/java/org/spigotmc/SpigotWorldConfig.java b/src/main/java/org/spigotmc/SpigotWorldConfig.java
 index 5485df1a1b59e81f4dcedd21dd972e1fd2759573..1cf6d4f854d89c515e48e1fb365eb95ff9340765 100644
 --- a/src/main/java/org/spigotmc/SpigotWorldConfig.java

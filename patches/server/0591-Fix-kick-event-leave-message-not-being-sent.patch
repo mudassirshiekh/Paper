@@ -50,7 +50,7 @@ index a65a1466dab52fca75cda16a4b22fef03b6207a0..0306771b8f90dcdd77f151c19c6c2d75
          MinecraftServer minecraftserver = this.server;
          Connection networkmanager = this.connection;
 diff --git a/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-index bce87f55ad85837a17f783b5341ef5b64ab0ede0..42c24ed58fab0f7ff9f58b2a65818f45a5b7cc06 100644
+index de6b8af2f586469cd97ad796ee9a841a83f8f068..cb7d038b902c326d2ebec61f1dc40849c3cfbc63 100644
 --- a/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 +++ b/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 @@ -1882,6 +1882,12 @@ public class ServerGamePacketListenerImpl extends ServerCommonPacketListenerImpl
@@ -96,7 +96,7 @@ index bce87f55ad85837a17f783b5341ef5b64ab0ede0..42c24ed58fab0f7ff9f58b2a65818f45
              this.server.getPlayerList().broadcastSystemMessage(PaperAdventure.asVanilla(quitMessage), false);
              // Paper end
 diff --git a/src/main/java/net/minecraft/server/players/PlayerList.java b/src/main/java/net/minecraft/server/players/PlayerList.java
-index dcb8de1c28b767068aa10f044bd8cf72ef6cfcaf..57e7ce227666a2e273c9e61a102152efd2c0ebd9 100644
+index dcb8de1c28b767068aa10f044bd8cf72ef6cfcaf..5d3f2bcdd830568b75ac05e32cec5b5cd72ce8c7 100644
 --- a/src/main/java/net/minecraft/server/players/PlayerList.java
 +++ b/src/main/java/net/minecraft/server/players/PlayerList.java
 @@ -569,6 +569,11 @@ public abstract class PlayerList {
@@ -111,3 +111,12 @@ index dcb8de1c28b767068aa10f044bd8cf72ef6cfcaf..57e7ce227666a2e273c9e61a102152ef
          ServerLevel worldserver = entityplayer.serverLevel();
  
          entityplayer.awardStat(Stats.LEAVE_GAME);
+@@ -579,7 +584,7 @@ public abstract class PlayerList {
+             entityplayer.closeContainer(org.bukkit.event.inventory.InventoryCloseEvent.Reason.DISCONNECT); // Paper - Inventory close reason
+         }
+ 
+-        PlayerQuitEvent playerQuitEvent = new PlayerQuitEvent(entityplayer.getBukkitEntity(), net.kyori.adventure.text.Component.translatable("multiplayer.player.left", net.kyori.adventure.text.format.NamedTextColor.YELLOW, io.papermc.paper.configuration.GlobalConfiguration.get().messages.useDisplayNameInQuitMessage ? entityplayer.getBukkitEntity().displayName() : io.papermc.paper.adventure.PaperAdventure.asAdventure(entityplayer.getDisplayName())), entityplayer.quitReason); // Paper - Adventure & Add API for quit reason
++        PlayerQuitEvent playerQuitEvent = new PlayerQuitEvent(entityplayer.getBukkitEntity(), leaveMessage, entityplayer.quitReason); // Paper - Adventure & Add API for quit reason
+         this.cserver.getPluginManager().callEvent(playerQuitEvent);
+         entityplayer.getBukkitEntity().disconnect(playerQuitEvent.getQuitMessage());
+ 
