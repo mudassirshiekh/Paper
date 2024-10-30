@@ -1,0 +1,25 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jason Penilla <11360596+jpenilla@users.noreply.github.com>
+Date: Tue, 29 Oct 2024 17:39:42 -0700
+Subject: [PATCH] Add isTickSleeping API
+
+
+diff --git a/src/main/java/org/bukkit/Server.java b/src/main/java/org/bukkit/Server.java
+index 6246251caf2c6f025c824b8e7a944b8d48751fa1..5d492abddced79a3f8f213440b01cdb6d4ae8afe 100644
+--- a/src/main/java/org/bukkit/Server.java
++++ b/src/main/java/org/bukkit/Server.java
+@@ -2438,6 +2438,14 @@ public interface Server extends PluginMessageRecipient, net.kyori.adventure.audi
+      * @return the potion brewer
+      */
+     @NotNull org.bukkit.potion.PotionBrewer getPotionBrewer();
++
++    /**
++     * Returns whether the server is 'tick sleeping' due to being
++     * empty for the period configured in server.properties.
++     *
++     * @return whether the server is 'tick sleeping'
++     */
++    boolean isTickSleeping();
+     // Paper end
+ 
+     // Paper start - Folia region threading API
