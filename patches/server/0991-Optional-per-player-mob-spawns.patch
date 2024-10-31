@@ -85,7 +85,7 @@ index 30f53916a9e49165bcfef2bea2c0b50a26f5a8a3..cb961d9051416626f499c1ca87107f11
      // CraftBukkit start
      public CraftPlayer.TransferCookieConnection transferCookieConnection;
 diff --git a/src/main/java/net/minecraft/world/level/NaturalSpawner.java b/src/main/java/net/minecraft/world/level/NaturalSpawner.java
-index ea6533c1ac218aa075da3401807a06fcb7892321..364510c0d0667e67aa3b25099a021f5f856fc113 100644
+index ea6533c1ac218aa075da3401807a06fcb7892321..558110e3d9d97b3eddd02e807039e6a31fcc3a63 100644
 --- a/src/main/java/net/minecraft/world/level/NaturalSpawner.java
 +++ b/src/main/java/net/minecraft/world/level/NaturalSpawner.java
 @@ -67,6 +67,12 @@ public final class NaturalSpawner {
@@ -119,7 +119,7 @@ index ea6533c1ac218aa075da3401807a06fcb7892321..364510c0d0667e67aa3b25099a021f5f
                  });
              }
          }
-@@ -138,13 +149,35 @@ public final class NaturalSpawner {
+@@ -138,13 +149,34 @@ public final class NaturalSpawner {
                  continue;
              }
  
@@ -150,14 +150,13 @@ index ea6533c1ac218aa075da3401807a06fcb7892321..364510c0d0667e67aa3b25099a021f5f
                  Objects.requireNonNull(info);
 -                NaturalSpawner.spawnCategoryForChunk(enumcreaturetype, world, chunk, spawnercreature_c, info::afterSpawn);
 +                // Paper start - Optional per player mob spawns
-+                int spawnCount = NaturalSpawner.spawnCategoryForChunk(enumcreaturetype, world, chunk, spawnercreature_c, info::afterSpawn,
++                NaturalSpawner.spawnCategoryForChunk(enumcreaturetype, world, chunk, spawnercreature_c, info::afterSpawn,
 +                    difference, world.paperConfig().entities.spawning.perPlayerMobSpawns ? world.getChunkSource().chunkMap::updatePlayerMobTypeMap : null);
-+                info.mobCategoryCounts.mergeInt(enumcreaturetype, spawnCount, Integer::sum);
 +                // Paper end - Optional per player mob spawns
              }
          }
  
-@@ -163,11 +196,17 @@ public final class NaturalSpawner {
+@@ -163,11 +195,17 @@ public final class NaturalSpawner {
      // Paper end - Add mobcaps commands
  
      public static void spawnCategoryForChunk(MobCategory group, ServerLevel world, LevelChunk chunk, NaturalSpawner.SpawnPredicate checker, NaturalSpawner.AfterSpawnCallback runner) {
@@ -176,7 +175,7 @@ index ea6533c1ac218aa075da3401807a06fcb7892321..364510c0d0667e67aa3b25099a021f5f
      }
  
      @VisibleForDebug
-@@ -178,15 +217,21 @@ public final class NaturalSpawner {
+@@ -178,15 +216,21 @@ public final class NaturalSpawner {
          });
      }
  
@@ -199,7 +198,7 @@ index ea6533c1ac218aa075da3401807a06fcb7892321..364510c0d0667e67aa3b25099a021f5f
              int k = 0;
  
              while (k < 3) {
-@@ -228,14 +273,14 @@ public final class NaturalSpawner {
+@@ -228,14 +272,14 @@ public final class NaturalSpawner {
                                      // Paper start - PreCreatureSpawnEvent
                                      PreSpawnStatus doSpawning = isValidSpawnPostitionForType(world, group, structuremanager, chunkgenerator, biomesettingsmobs_c, blockposition_mutableblockposition, d2);
                                      if (doSpawning == PreSpawnStatus.ABORT) {
@@ -216,7 +215,7 @@ index ea6533c1ac218aa075da3401807a06fcb7892321..364510c0d0667e67aa3b25099a021f5f
                                          }
  
                                          entityinsentient.moveTo(d0, (double) i, d1, world.random.nextFloat() * 360.0F, 0.0F);
-@@ -248,10 +293,15 @@ public final class NaturalSpawner {
+@@ -248,10 +292,15 @@ public final class NaturalSpawner {
                                                  ++j;
                                                  ++k1;
                                                  runner.run(entityinsentient, chunk);
@@ -234,7 +233,7 @@ index ea6533c1ac218aa075da3401807a06fcb7892321..364510c0d0667e67aa3b25099a021f5f
                                              }
  
                                              if (entityinsentient.isMaxGroupSizeReached(k1)) {
-@@ -273,6 +323,7 @@ public final class NaturalSpawner {
+@@ -273,6 +322,7 @@ public final class NaturalSpawner {
              }
  
          }
@@ -242,7 +241,7 @@ index ea6533c1ac218aa075da3401807a06fcb7892321..364510c0d0667e67aa3b25099a021f5f
      }
  
      private static boolean isRightDistanceToPlayerAndSpawnPoint(ServerLevel world, ChunkAccess chunk, BlockPos.MutableBlockPos pos, double squaredDistance) {
-@@ -523,7 +574,7 @@ public final class NaturalSpawner {
+@@ -523,7 +573,7 @@ public final class NaturalSpawner {
              MobCategory enumcreaturetype = entitytypes.getCategory();
  
              this.mobCategoryCounts.addTo(enumcreaturetype, 1);
@@ -251,7 +250,7 @@ index ea6533c1ac218aa075da3401807a06fcb7892321..364510c0d0667e67aa3b25099a021f5f
          }
  
          public int getSpawnableChunkCount() {
-@@ -539,6 +590,7 @@ public final class NaturalSpawner {
+@@ -539,6 +589,7 @@ public final class NaturalSpawner {
              int i = limit * this.spawnableChunkCount / NaturalSpawner.MAGIC_NUMBER;
              // CraftBukkit end
  
