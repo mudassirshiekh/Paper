@@ -1,7 +1,5 @@
 package io.papermc.generator.types.craftblockdata.property.holder;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.FieldSpec;
@@ -9,13 +7,10 @@ import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
-import io.papermc.generator.types.StructuredGenerator;
 import io.papermc.generator.types.Types;
+import io.papermc.generator.types.craftblockdata.CraftBlockDataGenerator;
 import io.papermc.generator.types.craftblockdata.property.converter.ConverterBase;
-import io.papermc.generator.types.craftblockdata.property.holder.appender.ArrayAppender;
-import io.papermc.generator.types.craftblockdata.property.holder.appender.DataAppender;
-import io.papermc.generator.types.craftblockdata.property.holder.appender.ListAppender;
-import io.papermc.generator.types.craftblockdata.property.holder.appender.MapAppender;
+import io.papermc.generator.types.craftblockdata.property.holder.appender.DataAppenders;
 import io.papermc.generator.utils.BlockStateMapping;
 import io.papermc.generator.utils.ClassHelper;
 import io.papermc.generator.utils.CommonVariable;
@@ -160,24 +155,8 @@ public class DataPropertyWriter extends DataPropertyWriterBase {
         return name;
     }
 
-    private static final Map<DataHolderType, DataAppender> APPENDERS;
-    private static final ImmutableMap.Builder<DataHolderType, DataAppender> builder = ImmutableMap.builder();
-
-    static {
-        register(new ArrayAppender());
-        register(new ListAppender());
-        register(new MapAppender());
-        APPENDERS = Maps.immutableEnumMap(builder.build());
-    }
-
-    private static void register(DataAppender converter) {
-        builder.put(converter.getType(), converter);
-    }
-
     @Override
-    public void addExtras(TypeSpec.Builder builder, FieldSpec field, ParameterSpec indexParameter, ConverterBase childConverter, StructuredGenerator<?> generator, NamingManager naming) {
-        if (APPENDERS.containsKey(this.type)) {
-            APPENDERS.get(this.type).addExtras(builder, field, indexParameter, childConverter, generator, naming);
-        }
+    public void addExtras(TypeSpec.Builder builder, FieldSpec field, ParameterSpec indexParameter, ConverterBase childConverter, CraftBlockDataGenerator<?> generator, NamingManager naming) {
+        DataAppenders.ifPresent(this.type, appender -> appender.addExtras(builder, field, indexParameter, childConverter, generator, naming));
     }
 }

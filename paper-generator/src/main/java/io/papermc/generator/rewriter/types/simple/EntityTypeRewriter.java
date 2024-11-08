@@ -20,7 +20,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 
-import static io.papermc.typewriter.utils.Formatting.quoted;
+import static io.papermc.typewriter.util.Formatting.quoted;
 
 public class EntityTypeRewriter extends EnumRegistryRewriter<EntityType<?>> {
 
@@ -146,11 +146,11 @@ public class EntityTypeRewriter extends EnumRegistryRewriter<EntityType<?>> {
     @Override
     protected EnumValue.Builder rewriteEnumValue(Holder.Reference<EntityType<?>> reference) {
         String path = reference.key().location().getPath();
-        List<String> arguments = Util.make(new ArrayList<>(), args -> {
-            args.add(quoted(path));
-            args.add(toBukkitClass(reference).concat(".class"));
-            args.add(Integer.toString(LEGACY_ID.getOrDefault(reference.value(), -1)));
-        });
+        List<String> arguments = new ArrayList<>(4);
+        arguments.add(quoted(path));
+        arguments.add(toBukkitClass(reference).concat(".class"));
+        arguments.add(Integer.toString(LEGACY_ID.getOrDefault(reference.value(), -1)));
+
         if (!reference.value().canSummon()) {
             arguments.add(Boolean.FALSE.toString());
         }

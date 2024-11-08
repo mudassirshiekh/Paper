@@ -648,7 +648,7 @@ index a8d6d7054110b5d95830296699f004418dae10db..acc25b08ed3b9f978229fa017d23f9fa
          LOOK,
          JUMP,
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index 6b042419af11730b0159c030ea1881dcfbb37dcd..8339da59b7a73411f45b77f6eb93e8ad65a1ef48 100644
+index 89a37c31c0376d66251fee36df4a78dac05c2031..b91dc9532380788f7b6b7a50a53625e1cb3889d2 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 @@ -2956,5 +2956,11 @@ public final class CraftServer implements Server {
@@ -663,46 +663,3 @@ index 6b042419af11730b0159c030ea1881dcfbb37dcd..8339da59b7a73411f45b77f6eb93e8ad
 +    }
      // Paper end
  }
-diff --git a/src/test/java/io/papermc/paper/entity/ai/MobGoalConverterTest.java b/src/test/java/io/papermc/paper/entity/ai/MobGoalConverterTest.java
-new file mode 100644
-index 0000000000000000000000000000000000000000..b020f795846d98f5464b390008be8815e892f9e8
---- /dev/null
-+++ b/src/test/java/io/papermc/paper/entity/ai/MobGoalConverterTest.java
-@@ -0,0 +1,37 @@
-+package io.papermc.paper.entity.ai;
-+
-+import com.destroystokyo.paper.entity.ai.MobGoalHelper;
-+import io.github.classgraph.ClassGraph;
-+import io.github.classgraph.ScanResult;
-+import net.minecraft.world.entity.Entity;
-+import net.minecraft.world.entity.Mob;
-+import org.junit.jupiter.api.Test;
-+import java.util.ArrayList;
-+import java.util.List;
-+
-+import static org.junit.jupiter.api.Assertions.assertFalse;
-+import static org.junit.jupiter.api.Assertions.fail;
-+
-+public class MobGoalConverterTest {
-+
-+    @Test
-+    public void testBukkitMap() {
-+        List<Class<Mob>> classes;
-+        try (ScanResult scanResult = new ClassGraph().enableAllInfo().whitelistPackages(Entity.class.getPackageName()).scan()) {
-+            classes = scanResult.getSubclasses(Mob.class.getName()).loadClasses(Mob.class);
-+        }
-+        assertFalse(classes.isEmpty(), "There are supposed to be more than 0 mob classes!");
-+
-+        List<String> missingClasses = new ArrayList<>();
-+        for (Class<Mob> nmsClass : classes) {
-+            Class<? extends org.bukkit.entity.Mob> bukkitClass = MobGoalHelper.toBukkitClass(nmsClass);
-+            if (bukkitClass == null) {
-+                missingClasses.add(nmsClass.getCanonicalName());
-+            }
-+        }
-+
-+        if (!missingClasses.isEmpty()) {
-+            fail("Missing some entity classes in the bukkit map (MobGoalHelper): " + String.join(", ", missingClasses));
-+        }
-+    }
-+}

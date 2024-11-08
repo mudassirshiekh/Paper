@@ -3,7 +3,7 @@ package io.papermc.generator.types.craftblockdata.property;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
-import io.papermc.generator.types.StructuredGenerator;
+import io.papermc.generator.types.craftblockdata.CraftBlockDataGenerator;
 import io.papermc.generator.types.craftblockdata.property.converter.Converters;
 import io.papermc.generator.utils.NamingManager;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -18,7 +18,7 @@ public class IntegerPropertyWriter extends PropertyWriter<Integer> {
     }
 
     @Override
-    public void addExtras(TypeSpec.Builder builder, FieldSpec field, StructuredGenerator<?> generator, NamingManager naming) {
+    public void addExtras(TypeSpec.Builder builder, FieldSpec field, CraftBlockDataGenerator<?> generator, NamingManager naming) {
         if (Converters.has(this.property)) {
             return;
         }

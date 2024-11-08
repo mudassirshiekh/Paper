@@ -22,7 +22,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import org.bukkit.Statistic;
 
-import static io.papermc.typewriter.utils.Formatting.quoted;
+import static io.papermc.typewriter.util.Formatting.quoted;
 
 @Deprecated(forRemoval = true)
 public class StatisticRewriter {
@@ -59,7 +59,8 @@ public class StatisticRewriter {
         .put("INTERACT_WITH_FURNACE", "FURNACE_INTERACTION")
         .put("INTERACT_WITH_CRAFTING_TABLE", "CRAFTING_TABLE_INTERACTION")
         .put("OPEN_CHEST", "CHEST_OPENED")
-        .put("OPEN_SHULKER_BOX", "SHULKER_BOX_OPENED").build();
+        .put("OPEN_SHULKER_BOX", "SHULKER_BOX_OPENED")
+        .build();
 
     public static class Custom extends EnumRegistryRewriter<ResourceLocation> {
 

@@ -10,14 +10,14 @@ import org.slf4j.Logger;
 import static javax.lang.model.element.Modifier.PUBLIC;
 
 @NullMarked
-public abstract class StructuredGenerator<T> extends SimpleGenerator {
+public abstract class OverriddenClassGenerator<T> extends SimpleGenerator {
 
     private static final Logger LOGGER = LogUtils.getLogger();
 
     protected final Class<? extends T> baseClass;
     protected boolean printWarningOnMissingOverride;
 
-    protected StructuredGenerator(Class<T> baseClass, String className, String packageName) {
+    protected OverriddenClassGenerator(Class<T> baseClass, String className, String packageName) {
         super(className, packageName);
         this.baseClass = baseClass;
     }

@@ -5,7 +5,7 @@ import com.mojang.logging.LogUtils;
 import io.papermc.generator.rewriter.registration.PaperPatternSourceSetRewriter;
 import io.papermc.generator.rewriter.registration.PatternSourceSetRewriter;
 import io.papermc.generator.types.SourceGenerator;
-import io.papermc.generator.utils.experimental.TagCollector;
+import io.papermc.generator.utils.experimental.ExperimentalCollector;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -66,7 +66,7 @@ public final class Main {
             MoreExecutors.directExecutor()
         ).join();
         reloadableServerResources.updateStaticRegistryTags();
-        EXPERIMENTAL_TAGS = TagCollector.grabExperimental(resourceManager);
+        EXPERIMENTAL_TAGS = ExperimentalCollector.collectTags(resourceManager);
     }
 
     private Main() {

@@ -75,7 +75,7 @@ import org.jspecify.annotations.NullMarked;
 
 import static io.papermc.generator.rewriter.registration.PaperPatternSourceSetRewriter.composite;
 import static io.papermc.generator.rewriter.registration.RewriterHolder.holder;
-import static io.papermc.typewriter.utils.Formatting.quoted;
+import static io.papermc.typewriter.util.Formatting.quoted;
 
 @NullMarked
 public final class Rewriters {

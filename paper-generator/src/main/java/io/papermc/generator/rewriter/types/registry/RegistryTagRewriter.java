@@ -18,7 +18,7 @@ import org.bukkit.Tag;
 import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 
-import static io.papermc.typewriter.utils.Formatting.quoted;
+import static io.papermc.typewriter.util.Formatting.quoted;
 import static javax.lang.model.element.Modifier.FINAL;
 import static javax.lang.model.element.Modifier.PUBLIC;
 import static javax.lang.model.element.Modifier.STATIC;

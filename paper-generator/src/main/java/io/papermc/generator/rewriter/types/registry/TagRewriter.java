@@ -21,7 +21,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.entity.EntityType;
 import org.jspecify.annotations.NullMarked;
 
-import static io.papermc.typewriter.utils.Formatting.quoted;
+import static io.papermc.typewriter.util.Formatting.quoted;
 
 @NullMarked
 public class TagRewriter extends SearchReplaceRewriter {

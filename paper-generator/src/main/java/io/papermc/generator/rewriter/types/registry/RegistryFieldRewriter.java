@@ -6,15 +6,14 @@ import com.mojang.logging.LogUtils;
 import io.papermc.generator.Main;
 import io.papermc.generator.rewriter.utils.Annotations;
 import io.papermc.generator.utils.Formatting;
-import io.papermc.generator.utils.RegistryUtils;
-import io.papermc.generator.utils.experimental.FlagHolders;
+import io.papermc.generator.utils.experimental.ExperimentalCollector;
 import io.papermc.generator.utils.experimental.SingleFlagHolder;
 import io.papermc.typewriter.ClassNamed;
 import io.papermc.typewriter.SourceFile;
 import io.papermc.typewriter.replace.SearchMetadata;
 import io.papermc.typewriter.replace.SearchReplaceRewriter;
 import java.util.Iterator;
-import java.util.Set;
+import java.util.Map;
 import java.util.function.Supplier;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
@@ -26,7 +25,7 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 
-import static io.papermc.typewriter.utils.Formatting.quoted;
+import static io.papermc.typewriter.util.Formatting.quoted;
 import static javax.lang.model.element.Modifier.FINAL;
 import static javax.lang.model.element.Modifier.PUBLIC;
 import static javax.lang.model.element.Modifier.STATIC;
@@ -37,7 +36,7 @@ public class RegistryFieldRewriter<T> extends SearchReplaceRewriter {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     private final Registry<T> registry;
-    private final Supplier<Set<ResourceKey<T>>> experimentalKeys;
+    private final Supplier<Map<ResourceKey<T>, SingleFlagHolder>> experimentalKeys;
     private final boolean isFilteredRegistry;
     private final @Nullable String fetchMethod;
 
@@ -45,7 +44,7 @@ public class RegistryFieldRewriter<T> extends SearchReplaceRewriter {
 
     public RegistryFieldRewriter(ResourceKey<? extends Registry<T>> registryKey, @Nullable String fetchMethod) {
         this.registry = Main.REGISTRY_ACCESS.lookupOrThrow(registryKey);
-        this.experimentalKeys = Suppliers.memoize(() -> RegistryUtils.collectExperimentalDataDrivenKeys(this.registry));
+        this.experimentalKeys = Suppliers.memoize(() -> ExperimentalCollector.collectDataDrivenElementIds(this.registry));
         this.isFilteredRegistry = FeatureElement.FILTERED_REGISTRIES.contains(registryKey);
         this.fetchMethod = fetchMethod;
     }
@@ -127,9 +126,7 @@ public class RegistryFieldRewriter<T> extends SearchReplaceRewriter {
             }
         } else {
             // data-driven registry
-            if (this.experimentalKeys.get().contains(reference.key())) {
-                return FlagHolders.NEXT_UPDATE;
-            }
+            return this.experimentalKeys.get().get(reference.key());
         }
         return null;
     }

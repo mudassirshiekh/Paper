@@ -30,7 +30,7 @@ dependencies {
 val generatedApiPath = file("generatedApi")
 val generatedServerPath = file("generatedServer")
 
-tasks.register<JavaExec>("generate") {
+val generate by tasks.registering(JavaExec::class) {
     dependsOn(tasks.check)
     mainClass.set("io.papermc.generator.Main")
     classpath(sourceSets.main.map { it.runtimeClasspath })
@@ -38,6 +38,13 @@ tasks.register<JavaExec>("generate") {
         project(":paper-api").sourceSets["main"].java.srcDirs.first().toString(),
         generatedServerPath.toString(),
         project(":paper-server").sourceSets["main"].java.srcDirs.first().toString())
+}
+
+generate.configure {
+    delete(generatedApiPath, generatedServerPath)
+    // the module depends on paper-api but generate into the project which cause conflict
+    // ideally this module would only depend on vanilla source in the long
+    // run
 }
 
 tasks.register<JavaExec>("scanOldGeneratedSourceCode") {

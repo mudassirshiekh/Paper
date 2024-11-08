@@ -13,12 +13,11 @@ import io.papermc.generator.types.SimpleGenerator;
 import io.papermc.generator.utils.Annotations;
 import io.papermc.generator.utils.Formatting;
 import io.papermc.generator.utils.Javadocs;
-import io.papermc.generator.utils.RegistryUtils;
-import io.papermc.generator.utils.experimental.FlagHolders;
+import io.papermc.generator.utils.experimental.ExperimentalCollector;
 import io.papermc.generator.utils.experimental.SingleFlagHolder;
 import io.papermc.paper.registry.RegistryKey;
 import io.papermc.paper.registry.TypedKey;
-import java.util.Set;
+import java.util.Map;
 import java.util.function.Supplier;
 import javax.lang.model.SourceVersion;
 import net.kyori.adventure.key.Key;
@@ -43,14 +42,14 @@ public class GeneratedKeyType<T> extends SimpleGenerator {
 
     private final RegistryEntry<T> entry;
     private final Registry<T> registry;
-    private final Supplier<Set<ResourceKey<T>>> experimentalKeys;
+    private final Supplier<Map<ResourceKey<T>, SingleFlagHolder>> experimentalKeys;
     private final boolean isFilteredRegistry;
 
     public GeneratedKeyType(String packageName, RegistryEntry<T> entry) {
         super(entry.keyClassName().concat("Keys"), packageName);
         this.entry = entry;
         this.registry = entry.registry();
-        this.experimentalKeys = Suppliers.memoize(() -> RegistryUtils.collectExperimentalDataDrivenKeys(this.registry));
+        this.experimentalKeys = Suppliers.memoize(() -> ExperimentalCollector.collectDataDrivenElementIds(this.registry));
         this.isFilteredRegistry = FeatureElement.FILTERED_REGISTRIES.contains(entry.registryKey());
     }
 
@@ -124,7 +123,7 @@ public class GeneratedKeyType<T> extends SimpleGenerator {
         return builder.addStaticImport(Key.class, "key");
     }
 
-    public @Nullable SingleFlagHolder getRequiredFeature(Holder.Reference<T> reference) {
+    protected @Nullable SingleFlagHolder getRequiredFeature(Holder.Reference<T> reference) {
         if (this.isFilteredRegistry) {
             // built-in registry
             FeatureElement element = (FeatureElement) reference.value();
@@ -133,9 +132,7 @@ public class GeneratedKeyType<T> extends SimpleGenerator {
             }
         } else {
             // data-driven registry
-            if (this.experimentalKeys.get().contains(reference.key())) {
-                return FlagHolders.NEXT_UPDATE;
-            }
+            return this.experimentalKeys.get().get(reference.key());
         }
         return null;
     }

@@ -6,7 +6,7 @@ import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeSpec;
-import io.papermc.generator.types.StructuredGenerator;
+import io.papermc.generator.types.craftblockdata.CraftBlockDataGenerator;
 import io.papermc.generator.types.craftblockdata.property.converter.ConverterBase;
 import io.papermc.generator.types.craftblockdata.property.holder.DataHolderType;
 import io.papermc.generator.utils.CommonVariable;
@@ -23,7 +23,7 @@ public class ArrayAppender implements DataAppender {
     }
 
     @Override
-    public void addExtras(TypeSpec.Builder builder, FieldSpec field, ParameterSpec indexParameter, ConverterBase childConverter, StructuredGenerator<?> generator, NamingManager naming) {
+    public void addExtras(TypeSpec.Builder builder, FieldSpec field, ParameterSpec indexParameter, ConverterBase childConverter, CraftBlockDataGenerator<?> generator, NamingManager naming) {
         if (childConverter.getApiType() == Boolean.TYPE) {
             String collectVarName = naming.getVariableNameWrapper().post("s").concat();
             MethodSpec.Builder methodBuilder = generator.createMethod(naming.getMethodNameWrapper().post("s").concat());

@@ -4,7 +4,6 @@ import java.util.Optional;
 import org.apache.commons.lang3.math.NumberUtils;
 import java.util.Comparator;
 import java.util.Locale;
-import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.function.Function;
 import java.util.regex.Pattern;
@@ -12,7 +11,6 @@ import java.util.stream.IntStream;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
@@ -75,7 +73,7 @@ public final class Formatting {
         return newName;
     }
 
-    public static Comparator<String> ALPHABETIC_KEY_ORDER = alphabeticKeyOrder(path -> path);
+    public static final Comparator<String> ALPHABETIC_KEY_ORDER = alphabeticKeyOrder(path -> path);
 
     public static <T> Comparator<T> alphabeticKeyOrder(Function<T, String> mapper) {
         return (o1, o2) -> {

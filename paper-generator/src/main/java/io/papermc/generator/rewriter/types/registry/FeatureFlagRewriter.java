@@ -16,7 +16,7 @@ import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 
 import static io.papermc.generator.rewriter.utils.Annotations.annotation;
-import static io.papermc.typewriter.utils.Formatting.quoted;
+import static io.papermc.typewriter.util.Formatting.quoted;
 
 @NullMarked
 public class FeatureFlagRewriter extends SearchReplaceRewriter {

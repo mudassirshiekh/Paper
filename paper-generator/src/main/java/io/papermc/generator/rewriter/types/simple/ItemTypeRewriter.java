@@ -1,7 +1,7 @@
 package io.papermc.generator.rewriter.types.simple;
 
 import io.papermc.generator.rewriter.types.registry.RegistryFieldRewriter;
-import io.papermc.typewriter.utils.ClassHelper;
+import io.papermc.typewriter.util.ClassHelper;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.Item;

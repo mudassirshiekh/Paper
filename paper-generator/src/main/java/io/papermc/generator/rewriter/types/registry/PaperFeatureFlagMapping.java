@@ -14,7 +14,7 @@ public class PaperFeatureFlagMapping extends SearchReplaceRewriter {
 
     @Override
     protected void insert(SearchMetadata metadata, StringBuilder builder) {
-        Iterator<ResourceLocation> flagIterator = FeatureFlags.REGISTRY.toNames(FeatureFlags.REGISTRY.allFlags()).stream().sorted(Formatting.alphabeticKeyOrder(name -> name.getPath())).iterator();
+        Iterator<ResourceLocation> flagIterator = FeatureFlags.REGISTRY.toNames(FeatureFlags.REGISTRY.allFlags()).stream().sorted(Formatting.alphabeticKeyOrder(ResourceLocation::getPath)).iterator();
 
         while (flagIterator.hasNext()) {
             ResourceLocation name = flagIterator.next();

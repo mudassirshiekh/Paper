@@ -4,7 +4,7 @@ import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeSpec;
-import io.papermc.generator.types.StructuredGenerator;
+import io.papermc.generator.types.craftblockdata.CraftBlockDataGenerator;
 import io.papermc.generator.utils.NamingManager;
 import java.util.Set;
 import net.minecraft.util.StringRepresentable;
@@ -35,7 +35,7 @@ public class EnumValuesAppender<T extends Enum<T> & StringRepresentable, A exten
     }
 
     @Override
-    public void addExtras(TypeSpec.Builder builder, FieldSpec field, StructuredGenerator<?> generator, NamingManager naming) {
+    public void addExtras(TypeSpec.Builder builder, FieldSpec field, CraftBlockDataGenerator<?> generator, NamingManager naming) {
         MethodSpec.Builder methodBuilder = generator.createMethod(this.methodName);
         methodBuilder.addStatement("return this.getValues($N, $T.class)", field, this.apiType);
         methodBuilder.returns(ParameterizedTypeName.get(Set.class, this.apiType));

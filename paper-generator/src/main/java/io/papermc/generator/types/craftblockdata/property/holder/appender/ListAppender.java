@@ -6,7 +6,7 @@ import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeSpec;
-import io.papermc.generator.types.StructuredGenerator;
+import io.papermc.generator.types.craftblockdata.CraftBlockDataGenerator;
 import io.papermc.generator.types.craftblockdata.property.converter.ConverterBase;
 import io.papermc.generator.types.craftblockdata.property.holder.DataHolderType;
 import io.papermc.generator.utils.CommonVariable;
@@ -28,7 +28,7 @@ public class ListAppender implements DataAppender {
     }
 
     @Override
-    public void addExtras(TypeSpec.Builder builder, FieldSpec field, ParameterSpec indexParameter, ConverterBase childConverter, StructuredGenerator<?> generator, NamingManager naming) {
+    public void addExtras(TypeSpec.Builder builder, FieldSpec field, ParameterSpec indexParameter, ConverterBase childConverter, CraftBlockDataGenerator<?> generator, NamingManager naming) {
         NamingManager.NameWrapper methodName = NamingManager.NameWrapper.wrap("get", METHOD_BASE_RENAMES.getOrDefault(naming.getMethodBaseName(), naming.getMethodBaseName()));
 
         if (childConverter.getApiType() == Boolean.TYPE) {

@@ -1,22 +1,25 @@
 package io.papermc.generator;
 
 import io.papermc.generator.utils.BlockStateMapping;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import net.minecraft.SharedConstants;
 import net.minecraft.server.Bootstrap;
 import net.minecraft.world.level.block.ChiseledBookShelfBlock;
+import net.minecraft.world.level.block.MossyCarpetBlock;
 import net.minecraft.world.level.block.PipeBlock;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.fail;
 
 public class BlockStatePropertyTest {
 
@@ -49,24 +52,24 @@ public class BlockStatePropertyTest {
         }
     }
 
-    {
-        // reference test
-        // if renamed should change DataPropertyWriter#FIELD_TO_BASE_NAME
-        var a = ChiseledBookShelfBlock.SLOT_OCCUPIED_PROPERTIES;
-        var b = PipeBlock.PROPERTY_BY_DIRECTION;
+    @Test
+    public void testReferences() throws NoSuchFieldException, IllegalAccessException {
+        // if renamed should change DataPropertyWriter#FIELD_TO_BASE_NAME/FIELD_TO_BASE_NAME_SPECIFICS
+        MethodHandles.Lookup lookup = MethodHandles.lookup();
+        lookup.findStaticVarHandle(ChiseledBookShelfBlock.class, "SLOT_OCCUPIED_PROPERTIES", List.class);
+        lookup.findStaticVarHandle(PipeBlock.class, "PROPERTY_BY_DIRECTION", Map.class);
+        MethodHandles.privateLookupIn(MossyCarpetBlock.class, lookup).findStaticVarHandle(MossyCarpetBlock.class, "PROPERTY_BY_DIRECTION", Map.class);
     }
 
     @Test
     public void testBridge() {
-        Set<String> missingApisEquivalent = new HashSet<>();
+        Set<String> missingApiEquivalents = new HashSet<>();
         for (Class<? extends Comparable<?>> value : ENUM_PROPERTY_VALUES) {
             if (!BlockStateMapping.ENUM_BRIDGE.containsKey(value)) {
-                missingApisEquivalent.add(value.getCanonicalName());
+                missingApiEquivalents.add(value.getCanonicalName());
             }
         }
 
-        if (!missingApisEquivalent.isEmpty()) {
-            fail("Missing some api equivalent in the blockstate mapping enum bridge (BlockStateMapping#ENUM_BRIDGE) : " + String.join(", ", missingApisEquivalent));
-        }
+        Assertions.assertTrue(missingApiEquivalents.isEmpty(), () -> "Missing some api equivalent in the block state mapping enum bridge (BlockStateMapping#ENUM_BRIDGE) : " + String.join(", ", missingApiEquivalents));
     }
 }

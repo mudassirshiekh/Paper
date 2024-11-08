@@ -42,7 +42,7 @@ public record SingleFlagHolder(FeatureFlag flag) implements FlagHolder { // todo
     public MinecraftExperimental.Requires asAnnotationMember() {
         MinecraftExperimental.Requires annotationMember = FlagHolders.ANNOTATION_EQUIVALENT.get(this.flag);
         if (annotationMember == null) {
-            throw new UnsupportedOperationException("Don't know that feature flag : " + FEATURE_FLAG_NAME.get(this.flag));
+            throw new UnsupportedOperationException("Don't know that feature flag: " + FEATURE_FLAG_NAME.get(this.flag));
         }
         return annotationMember;
     }

@@ -25,7 +25,7 @@ import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 
-import static io.papermc.typewriter.utils.Formatting.quoted;
+import static io.papermc.typewriter.util.Formatting.quoted;
 
 public class MemoryKeyRewriter extends RegistryFieldRewriter<MemoryModuleType<?>> {
 

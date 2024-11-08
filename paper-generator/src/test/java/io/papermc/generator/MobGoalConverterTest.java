@@ -10,14 +10,14 @@ import net.minecraft.world.entity.Mob;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MobGoalConverterTest {
 
     @Test
     public void testBukkitMap() {
         final List<Class<Mob>> classes;
-        try (ScanResult scanResult = new ClassGraph().enableAllInfo().whitelistPackages(Entity.class.getPackageName()).scan()) {
+        try (ScanResult scanResult = new ClassGraph().enableClassInfo().whitelistPackages(Entity.class.getPackageName()).scan()) {
             classes = scanResult.getSubclasses(Mob.class.getName()).loadClasses(Mob.class);
         }
 
@@ -30,8 +30,6 @@ public class MobGoalConverterTest {
             }
         }
 
-        if (!missingClasses.isEmpty()) {
-            fail("Missing some entity classes in the bukkit map: " + String.join(", ", missingClasses));
-        }
+        assertTrue(missingClasses.isEmpty(), () -> "Missing some entity classes in the bukkit map: " + String.join(", ", missingClasses));
     }
 }

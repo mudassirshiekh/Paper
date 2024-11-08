@@ -59,7 +59,7 @@ public final class ClassHelper {
         return (field.getModifiers() & flags) == flags;
     }
 
-    public static <T> Class<? extends T> classOr(String className, Class<? extends T> defaultClass) {
+    public static <T> @Nullable Class<? extends T> classOr(String className, @Nullable Class<? extends T> defaultClass) {
         try {
             return (Class<? extends T>) Class.forName(className);
         } catch (ClassNotFoundException ignored) {

@@ -4,12 +4,11 @@ import com.google.common.base.Suppliers;
 import io.papermc.generator.Main;
 import io.papermc.generator.rewriter.utils.Annotations;
 import io.papermc.generator.utils.Formatting;
-import io.papermc.generator.utils.RegistryUtils;
-import io.papermc.generator.utils.experimental.FlagHolders;
+import io.papermc.generator.utils.experimental.ExperimentalCollector;
 import io.papermc.generator.utils.experimental.SingleFlagHolder;
 import io.papermc.typewriter.preset.EnumRewriter;
 import io.papermc.typewriter.preset.model.EnumValue;
-import java.util.Set;
+import java.util.Map;
 import java.util.function.Supplier;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
@@ -19,13 +18,13 @@ import net.minecraft.world.flag.FeatureFlags;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
-import static io.papermc.typewriter.utils.Formatting.quoted;
+import static io.papermc.typewriter.util.Formatting.quoted;
 
 @NullMarked
 public class EnumRegistryRewriter<T> extends EnumRewriter<Holder.Reference<T>> {
 
     private final Registry<T> registry;
-    private final Supplier<Set<ResourceKey<T>>> experimentalKeys;
+    private final Supplier<Map<ResourceKey<T>, SingleFlagHolder>> experimentalKeys;
     private final boolean isFilteredRegistry;
     private final boolean hasKeyArgument;
 
@@ -35,7 +34,7 @@ public class EnumRegistryRewriter<T> extends EnumRewriter<Holder.Reference<T>> {
 
     protected EnumRegistryRewriter(ResourceKey<? extends Registry<T>> registryKey, boolean hasKeyArgument) {
         this.registry = Main.REGISTRY_ACCESS.lookupOrThrow(registryKey);
-        this.experimentalKeys = Suppliers.memoize(() -> RegistryUtils.collectExperimentalDataDrivenKeys(this.registry));
+        this.experimentalKeys = Suppliers.memoize(() -> ExperimentalCollector.collectDataDrivenElementIds(this.registry));
         this.isFilteredRegistry = FeatureElement.FILTERED_REGISTRIES.contains(registryKey);
         this.hasKeyArgument = hasKeyArgument;
     }
@@ -74,9 +73,7 @@ public class EnumRegistryRewriter<T> extends EnumRewriter<Holder.Reference<T>> {
             }
         } else {
             // data-driven registry
-            if (this.experimentalKeys.get().contains(reference.key())) {
-                return FlagHolders.NEXT_UPDATE;
-            }
+            return this.experimentalKeys.get().get(reference.key());
         }
         return null;
     }

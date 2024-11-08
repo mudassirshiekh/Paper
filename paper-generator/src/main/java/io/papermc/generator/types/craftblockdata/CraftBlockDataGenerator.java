@@ -8,7 +8,7 @@ import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.TypeSpec;
-import io.papermc.generator.types.StructuredGenerator;
+import io.papermc.generator.types.OverriddenClassGenerator;
 import io.papermc.generator.types.Types;
 import io.papermc.generator.types.craftblockdata.property.PropertyMaker;
 import io.papermc.generator.types.craftblockdata.property.PropertyWriter;
@@ -46,7 +46,7 @@ import static javax.lang.model.element.Modifier.PUBLIC;
 import static javax.lang.model.element.Modifier.STATIC;
 
 @NullMarked
-public class CraftBlockDataGenerator<T extends BlockData> extends StructuredGenerator<T> {
+public class CraftBlockDataGenerator<T extends BlockData> extends OverriddenClassGenerator<T> {
 
     private final Class<? extends Block> blockClass;
     private final BlockStateMapping.BlockData blockData;
@@ -66,7 +66,7 @@ public class CraftBlockDataGenerator<T extends BlockData> extends StructuredGene
         .put(BlockStateProperties.EYE, keywordGet("has"))
         .put(BlockStateProperties.BERRIES, keywordGet("has")) // spigot method rename
         // data holder keywords is only needed for the first property they hold
-        .put(ChiseledBookShelfBlock.SLOT_OCCUPIED_PROPERTIES.get(0), keywordGet("is"))
+        .put(ChiseledBookShelfBlock.SLOT_OCCUPIED_PROPERTIES.getFirst(), keywordGet("is"))
         .build();
 
     private static final Map<Property<?>, BiConsumer<ParameterSpec, MethodSpec.Builder>> SETTER_PRECONDITIONS = Map.of(

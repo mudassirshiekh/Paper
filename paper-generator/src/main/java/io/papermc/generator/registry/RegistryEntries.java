@@ -6,6 +6,7 @@ import io.papermc.paper.registry.data.GameEventRegistryEntry;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.List;
@@ -13,6 +14,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import net.minecraft.core.Registry;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.Registries;
@@ -38,6 +40,7 @@ import net.minecraft.world.item.equipment.trim.TrimPatterns;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BannerPatterns;
+import net.minecraft.world.level.levelgen.structure.BuiltinStructures;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.saveddata.maps.MapDecorationTypes;
 import org.bukkit.Art;
@@ -70,36 +73,29 @@ import org.bukkit.map.MapCursor;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
 
 @NullMarked
 public final class RegistryEntries {
 
-    private static <T> RegistryEntry<T> entry(ResourceKey<? extends Registry<T>> registryKey, @Nullable Class<?> registryConstantClass, Class<? extends Keyed> apiClass, String implClass) {
-        return new RegistryEntry<>(registryKey, (RegistryKeyField<T>) REGISTRY_KEY_FIELDS.get(registryKey), registryConstantClass, apiClass, implClass);
+    private static <T> RegistryEntry<T> entry(ResourceKey<? extends Registry<T>> registryKey, Class<?> holderElementsClass, Class<? extends Keyed> apiClass, String implClass) {
+        return new RegistryEntry<>(registryKey, (RegistryKeyField<T>) REGISTRY_KEY_FIELDS.get(registryKey), holderElementsClass, apiClass, implClass);
     }
 
     // CraftBukkit entry where implementation start by "Craft"
-    private static <T> RegistryEntry<T> entry(ResourceKey<? extends Registry<T>> registryKey, @Nullable Class<?> registryConstantClass, Class<? extends Keyed> apiClass) {
-        return entry(registryKey, registryConstantClass, "Craft", apiClass);
+    private static <T> RegistryEntry<T> entry(ResourceKey<? extends Registry<T>> registryKey, Class<?> holderElementsClass, Class<? extends Keyed> apiClass) {
+        return entry(registryKey, holderElementsClass, "Craft", apiClass);
     }
 
-    private static <T> RegistryEntry<T> entry(ResourceKey<? extends Registry<T>> registryKey, @Nullable Class<?> registryConstantClass, String implPrefix, Class<? extends Keyed> apiClass) {
-        String name = io.papermc.typewriter.utils.ClassHelper.retrieveFullNestedName(apiClass);
+    private static <T> RegistryEntry<T> entry(ResourceKey<? extends Registry<T>> registryKey, Class<?> holderElementsClass, String implPrefix, Class<? extends Keyed> apiClass) {
+        String name = io.papermc.typewriter.util.ClassHelper.retrieveFullNestedName(apiClass);
         RegistryKeyField<T> registryKeyField = (RegistryKeyField<T>) REGISTRY_KEY_FIELDS.get(registryKey);
         String[] classes = name.split("\\.");
         if (classes.length == 0) {
-            return new RegistryEntry<>(registryKey, registryKeyField, registryConstantClass, apiClass, implPrefix.concat(apiClass.getSimpleName()));
+            return new RegistryEntry<>(registryKey, registryKeyField, holderElementsClass, apiClass, implPrefix.concat(apiClass.getSimpleName()));
         }
 
-        StringBuilder implName = new StringBuilder(name.length() + implPrefix.length() * classes.length);
-        implName.append(implPrefix.concat(classes[0]));
-        for (int i = 1; i < classes.length; i++) {
-            implName.append('.');
-            implName.append(implPrefix.concat(classes[i]));
-        }
-
-        return new RegistryEntry<>(registryKey, registryKeyField, registryConstantClass, apiClass,implName.toString());
+        String implName = Arrays.stream(classes).map(implPrefix::concat).collect(Collectors.joining("."));
+        return new RegistryEntry<>(registryKey, registryKeyField, holderElementsClass, apiClass, implName);
     }
 
     private static final Map<ResourceKey<? extends Registry<?>>, RegistryKeyField<?>> REGISTRY_KEY_FIELDS;
@@ -148,7 +144,7 @@ public final class RegistryEntries {
 
     public static final List<RegistryEntry<?>> DATA_DRIVEN = List.of(
         entry(Registries.BIOME, Biomes.class, Biome.class).delayed(),
-        entry(Registries.STRUCTURE, null, Structure.class).delayed(),
+        entry(Registries.STRUCTURE, BuiltinStructures.class, Structure.class).delayed(),
         entry(Registries.TRIM_MATERIAL, TrimMaterials.class, TrimMaterial.class).delayed(),
         entry(Registries.TRIM_PATTERN, TrimPatterns.class, TrimPattern.class).delayed(),
         entry(Registries.DAMAGE_TYPE, DamageTypes.class, DamageType.class).delayed(),

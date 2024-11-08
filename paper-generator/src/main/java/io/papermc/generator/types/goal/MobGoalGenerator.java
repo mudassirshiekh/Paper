@@ -15,9 +15,10 @@ import io.papermc.generator.types.SimpleGenerator;
 import io.papermc.generator.utils.Annotations;
 import io.papermc.generator.utils.Formatting;
 import io.papermc.generator.utils.Javadocs;
-import io.papermc.typewriter.utils.ClassHelper;
+import io.papermc.typewriter.util.ClassHelper;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Stream;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.goal.GoalSelector;
 import net.minecraft.world.entity.ai.goal.WrappedGoal;
@@ -64,17 +65,16 @@ public class MobGoalGenerator extends SimpleGenerator {
             classes = scanResult.getSubclasses(Goal.class.getName()).loadClasses(Goal.class);
         }
 
-        List<GoalKey<Mob>> vanillaGoals = classes.stream()
+        Stream<GoalKey<Mob>> vanillaGoals = classes.stream()
             .filter(clazz -> !java.lang.reflect.Modifier.isAbstract(clazz.getModifiers()))
             .filter(clazz -> !clazz.isAnonymousClass() || ClassHelper.getTopLevelClass(clazz) != GoalSelector.class)
             .filter(clazz -> !WrappedGoal.class.equals(clazz)) // TODO - properly fix
             .map(MobGoalNames::getKey)
             .sorted(Comparator.<GoalKey<?>, String>comparing(o -> o.getEntityClass().getSimpleName())
                 .thenComparing(vanillaGoalKey -> vanillaGoalKey.getNamespacedKey().getKey())
-            )
-            .toList();
+            );
 
-        for (GoalKey<?> goalKey : vanillaGoals) {
+        vanillaGoals.forEach(goalKey -> {
             String keyPath = goalKey.getNamespacedKey().getKey();
             String fieldName = Formatting.formatKeyAsField(keyPath);
 
@@ -82,7 +82,7 @@ public class MobGoalGenerator extends SimpleGenerator {
             FieldSpec.Builder fieldBuilder = FieldSpec.builder(typedKey, fieldName, PUBLIC, STATIC, FINAL)
                 .initializer("$N($S, $T.class)", createMethod.build(), keyPath, goalKey.getEntityClass());
             typeBuilder.addField(fieldBuilder.build());
-        }
+        });
 
         return typeBuilder.addMethod(createMethod.build()).build();
     }

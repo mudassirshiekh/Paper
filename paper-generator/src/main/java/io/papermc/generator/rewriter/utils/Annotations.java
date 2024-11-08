@@ -2,7 +2,7 @@ package io.papermc.generator.rewriter.utils;
 
 import io.papermc.generator.utils.experimental.SingleFlagHolder;
 import io.papermc.typewriter.context.ImportCollector;
-import io.papermc.typewriter.utils.ClassHelper;
+import io.papermc.typewriter.util.ClassHelper;
 import java.lang.annotation.Annotation;
 import org.bukkit.MinecraftExperimental;
 import org.jetbrains.annotations.ApiStatus;

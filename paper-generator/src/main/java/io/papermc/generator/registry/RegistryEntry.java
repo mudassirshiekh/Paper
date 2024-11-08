@@ -22,8 +22,8 @@ public final class RegistryEntry<T> {
 
     private final ResourceKey<? extends Registry<T>> registryKey;
     private final RegistryKeyField<T> registryKeyField;
-    private final Class<T> registryElementClass;
-    private final @Nullable Class<?> registryConstantClass;
+    private final Class<T> elementClass;
+    private final Class<?> holderElementsClass;
 
     private final Class<? extends Keyed> apiClass; // TODO remove Keyed
     private final String implClass;
@@ -37,11 +37,11 @@ public final class RegistryEntry<T> {
 
     private @Nullable Map<ResourceKey<T>, String> fieldNames;
 
-    public RegistryEntry(ResourceKey<? extends Registry<T>> registryKey, RegistryKeyField<T> registryKeyField, @Nullable Class<?> registryConstantClass, Class<? extends Keyed> apiClass, String implClass) {
+    public RegistryEntry(ResourceKey<? extends Registry<T>> registryKey, RegistryKeyField<T> registryKeyField, Class<?> holderElementsClass, Class<? extends Keyed> apiClass, String implClass) {
         this.registryKey = registryKey;
         this.registryKeyField = registryKeyField;
-        this.registryElementClass = registryKeyField.elementClass();
-        this.registryConstantClass = registryConstantClass;
+        this.elementClass = registryKeyField.elementClass();
+        this.holderElementsClass = holderElementsClass;
         this.apiClass = apiClass;
         this.implClass = implClass;
     }
@@ -112,7 +112,7 @@ public final class RegistryEntry<T> {
             return this.apiClass.getSimpleName();
         }
 
-        return this.registryElementClass.getSimpleName();
+        return this.elementClass.getSimpleName();
     }
 
     public boolean allowCustomKeys() {
@@ -122,18 +122,18 @@ public final class RegistryEntry<T> {
     private <TO> Map<ResourceKey<T>, TO> getFields(Map<ResourceKey<T>, TO> map, Function<Field, @Nullable TO> transform) {
         Registry<T> registry = this.registry();
         try {
-            for (Field field : this.registryConstantClass.getDeclaredFields()) {
-                if (!ResourceKey.class.isAssignableFrom(field.getType()) && !Holder.Reference.class.isAssignableFrom(field.getType()) && !this.registryElementClass.isAssignableFrom(field.getType())) {
+            for (Field field : this.holderElementsClass.getDeclaredFields()) {
+                if (!ResourceKey.class.isAssignableFrom(field.getType()) && !Holder.Reference.class.isAssignableFrom(field.getType()) && !this.elementClass.isAssignableFrom(field.getType())) {
                     continue;
                 }
 
                 if (ClassHelper.isStaticConstant(field, Modifier.PUBLIC)) {
                     ResourceKey<T> key = null;
-                    if (this.registryElementClass.isAssignableFrom(field.getType())) {
-                        key = registry.getResourceKey(this.registryElementClass.cast(field.get(null))).orElseThrow();
+                    if (this.elementClass.isAssignableFrom(field.getType())) {
+                        key = registry.getResourceKey(this.elementClass.cast(field.get(null))).orElseThrow();
                     } else {
                         if (field.getGenericType() instanceof ParameterizedType complexType && complexType.getActualTypeArguments().length == 1 &&
-                            complexType.getActualTypeArguments()[0] == this.registryElementClass) {
+                            complexType.getActualTypeArguments()[0] == this.elementClass) {
 
                             if (Holder.Reference.class.isAssignableFrom(field.getType())) {
                                 key = ((Holder.Reference<T>) field.get(null)).key();
@@ -164,10 +164,6 @@ public final class RegistryEntry<T> {
     }
 
     public <TO> Map<ResourceKey<T>, TO> getFields(Function<Field, @Nullable TO> transform) {
-        if (this.registryConstantClass == null) {
-            return Collections.emptyMap();
-        }
-
         return Collections.unmodifiableMap(this.getFields(new IdentityHashMap<>(), transform));
     }
 

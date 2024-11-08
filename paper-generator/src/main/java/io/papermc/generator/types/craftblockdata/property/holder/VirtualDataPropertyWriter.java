@@ -7,7 +7,7 @@ import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
-import io.papermc.generator.types.StructuredGenerator;
+import io.papermc.generator.types.craftblockdata.CraftBlockDataGenerator;
 import io.papermc.generator.types.craftblockdata.property.converter.ConverterBase;
 import io.papermc.generator.utils.BlockStateMapping;
 import io.papermc.generator.utils.NamingManager;
@@ -93,7 +93,7 @@ public class VirtualDataPropertyWriter extends DataPropertyWriterBase {
     }
 
     @Override
-    public void addExtras(TypeSpec.Builder builder, FieldSpec field, ParameterSpec indexParameter, ConverterBase converter, StructuredGenerator<?> generator, NamingManager naming) {
+    public void addExtras(TypeSpec.Builder builder, FieldSpec field, ParameterSpec indexParameter, ConverterBase converter, CraftBlockDataGenerator<?> generator, NamingManager naming) {
 
     }
 }

@@ -3,13 +3,11 @@ package io.papermc.generator.rewriter.types.simple;
 import io.papermc.generator.rewriter.types.registry.RegistryFieldRewriter;
 import io.papermc.generator.utils.Formatting;
 import io.papermc.typewriter.parser.Lexer;
-import io.papermc.typewriter.parser.exception.ParserException;
 import io.papermc.typewriter.parser.token.CharSequenceBlockToken;
 import io.papermc.typewriter.parser.token.CharSequenceToken;
-import io.papermc.typewriter.parser.token.Token;
 import io.papermc.typewriter.parser.token.TokenType;
+import io.papermc.typewriter.parser.SequenceTokens;
 import io.papermc.typewriter.replace.SearchMetadata;
-import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
@@ -20,7 +18,6 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.world.entity.npc.VillagerProfession;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.jetbrains.annotations.ApiStatus;
-import org.jspecify.annotations.Nullable;
 
 @ApiStatus.Experimental
 public class VillagerProfessionRewriter extends RegistryFieldRewriter<VillagerProfession> {
@@ -37,106 +34,80 @@ public class VillagerProfessionRewriter extends RegistryFieldRewriter<VillagerPr
 
     private @MonotonicNonNull Map<String, List<String>> javadocsPerConstant;
 
+    private static class ConstantInfo {
+        private @MonotonicNonNull String constantName;
+        private @MonotonicNonNull List<String> javadocs;
+
+        public void constantName(String name) {
+            this.constantName = name;
+        }
+
+        public void javadocs(List<String> javadocs) {
+            this.javadocs = javadocs;
+        }
+
+        public String constantName() {
+            return this.constantName;
+        }
+
+        public List<String> javadocs() {
+            return this.javadocs;
+        }
+
+        public boolean isEmpty() {
+            return this.constantName == null || this.javadocs == null;
+        }
+    }
+
     private Map<String, List<String>> parseConstantJavadocs(String content) {
         Map<String, List<String>> map = new HashMap<>();
 
         Lexer lex = new Lexer(content.toCharArray());
-        String constantName = null;
-        List<String> javadocs = null;
-        boolean firstId = true;
-        while (lex.canRead()) {
-            Token token = lex.readToken();
-            if (token.type() == TokenType.EOI) {
-                break;
-            }
-
-            if (token.type() == TokenType.SECO) {
-                if (constantName != null && javadocs != null) {
-                    map.put(constantName, new ArrayList<>(javadocs));
-                }
-                firstId = true;
-                constantName = null;
-                javadocs = null;
-                continue;
-            }
-
-            if (FORMAT_TOKENS.contains(token.type())) {
-                continue;
-            }
-
-            if (token.type() == TokenType.LPAREN && constantName != null) {
-                if (!this.skipClosure(lex)) {
-                    return map;
-                }
-                continue;
-            }
-
-            if (token.type() == TokenType.JAVADOC) {
-                javadocs = ((CharSequenceBlockToken) token).value();
-            } else if (token.type() == TokenType.PUBLIC || token.type() == TokenType.STATIC || token.type() == TokenType.FINAL) {
-                // should check duplicate per statement
-                continue; // ignore
-            } else if (token.type() == TokenType.IDENTIFIER && constantName == null) {
-                if (firstId) {
-                    Token nextToken = this.skipTypeName(lex);
-                    if (nextToken != null && nextToken.type() == TokenType.IDENTIFIER) {
-                        token = nextToken;
-                    }
-                    firstId = false;
-                }
-
-                constantName = ((CharSequenceToken) token).value();
-            }
-        }
+        SequenceTokens.wrap(lex, FORMAT_TOKENS)
+            .group(action -> {
+                ConstantInfo info = new ConstantInfo();
+                action
+                    .map(TokenType.JAVADOC, token -> {
+                        info.javadocs(((CharSequenceBlockToken) token).value());
+                    }, SequenceTokens.TokenTask::asOptional)
+                    .skipQualifiedName(Set.of(TokenType.JAVADOC))
+                    .map(TokenType.IDENTIFIER, token -> {
+                        info.constantName(((CharSequenceToken) token).value());
+                    })
+                    .skip(TokenType.IDENTIFIER)
+                    .skipClosure(TokenType.LPAREN, TokenType.RPAREN, true)
+                    .map(TokenType.SECO, $ -> {
+                        if (!info.isEmpty()) {
+                            map.put(info.constantName(), info.javadocs());
+                        }
+                    });
+            }, SequenceTokens.TokenTask::asRepeatable)
+            .execute();
+        /*
+        for enums:
+        SequenceTokens.wrap(lex, FORMAT_TOKENS)
+            .group(action -> {
+                ConstantInfo info = new ConstantInfo();
+                action
+                    .map(TokenType.JAVADOC, token -> {
+                        info.javadocs(((CharSequenceBlockToken) token).value());
+                    }, SequenceTokens.TokenTask::asOptional)
+                    .map(TokenType.IDENTIFIER, token -> {
+                        info.constantName(((CharSequenceToken) token).value());
+                    })
+                    .skipClosure(TokenType.LPAREN, TokenType.RPAREN, true)
+                    .skipClosure(TokenType.LSCOPE, TokenType.RSCOPE, true)
+                    .mapMulti(Set.of(TokenType.CO, TokenType.SECO), $ -> {
+                        // this part will probably fail for the last entry for enum without end (,;)
+                        if (!info.isEmpty()) {
+                            map.put(info.constantName(), info.javadocs());
+                        }
+                    });
+            }, SequenceTokens.TokenTask::asRepeatable)
+            .execute();
+        */
 
         return map;
-    }
-
-    private boolean skipClosure(Lexer lex) {
-        int parenDepth = 1;
-        while (lex.canRead()) {
-            Token nestedToken = lex.readToken();
-            if (nestedToken.type() == TokenType.EOI) {
-                return false;
-            }
-
-            if (nestedToken.type() == TokenType.LPAREN) {
-                parenDepth++;
-            } else if (nestedToken.type() == TokenType.RPAREN) {
-                parenDepth--;
-            }
-
-            if (parenDepth == 0) {
-                break;
-            }
-
-            if (parenDepth < 0) {
-                throw new ParserException("Unbalanced parenthesis", nestedToken);
-            }
-        }
-
-        return true;
-    }
-
-    private @Nullable Token skipTypeName(Lexer lex) {
-        boolean expectDot = true;
-        while (lex.canRead()) {
-            Token token = lex.readToken();
-            if (token.type() == TokenType.EOI) {
-                break;
-            }
-
-            if (FORMAT_TOKENS.contains(token.type()) || token.type() == TokenType.JAVADOC) {
-                continue; // ignore intrusive comments inside the name
-            }
-
-            if (token.type() == (expectDot ? TokenType.DOT : TokenType.IDENTIFIER)) {
-                expectDot = !expectDot;
-            } else {
-                return token;
-            }
-        }
-        return null;
     }
 
     @Override
